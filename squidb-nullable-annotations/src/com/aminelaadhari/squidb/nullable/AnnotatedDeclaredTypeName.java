@@ -3,42 +3,32 @@ package com.aminelaadhari.squidb.nullable;
 import com.yahoo.aptutils.model.DeclaredTypeName;
 
 public class AnnotatedDeclaredTypeName extends DeclaredTypeName {
-    private final String annotation;
+    private final Class annotation;
 
-    public AnnotatedDeclaredTypeName(DeclaredTypeName declaredTypeName, String annotation) {
+    public AnnotatedDeclaredTypeName(DeclaredTypeName declaredTypeName, Class annotation) {
         super(declaredTypeName.getPackageName(), declaredTypeName.getSimpleName());
         this.annotation = annotation;
     }
 
-    public AnnotatedDeclaredTypeName(String packageName, String simpleName, String annotation) {
-        super(packageName, simpleName);
-        this.annotation = annotation;
-    }
-
-    public AnnotatedDeclaredTypeName(String fullyQualifiedName, String annotation) {
-        super(fullyQualifiedName);
-        this.annotation = annotation;
-    }
-
-    public String getAnnotation() {
+    public Class getAnnotation() {
         return annotation;
     }
 
     @Override
     public String toString() {
-        if (annotation == null || annotation.isEmpty()) {
+        if (annotation == null) {
             return super.toString();
         } else {
-            return annotation + " " + super.toString();
+            return "@" + annotation.getName() + " " + super.toString();
         }
     }
 
     @Override
     public String getSimpleName() {
-        if (annotation == null || annotation.isEmpty()) {
+        if (annotation == null) {
             return super.getSimpleName();
         } else {
-            return annotation + " " + super.getSimpleName();
+            return "@" + annotation.getName() + " " + super.getSimpleName();
         }
     }
 

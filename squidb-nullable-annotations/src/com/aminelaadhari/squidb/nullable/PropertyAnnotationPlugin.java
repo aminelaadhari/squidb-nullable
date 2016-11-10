@@ -15,18 +15,18 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class NullablePlugin extends Plugin {
-    public NullablePlugin(ModelSpec<?> modelSpec, PluginEnvironment pluginEnv) {
+public class PropertyAnnotationPlugin extends Plugin {
+    public PropertyAnnotationPlugin(ModelSpec<?> modelSpec, PluginEnvironment pluginEnv) {
         super(modelSpec, pluginEnv);
     }
 
     @Override
     public void beforeEmitGetter(JavaFileWriter writer, PropertyGenerator propertyGenerator, MethodDeclarationParameters getterParams) throws IOException {
         if (propertyGenerator.getField().getAnnotation(Nonnull.class) != null) {
-            writer.writeAnnotation(new DeclaredTypeName("javax.annotation", "Nonnull"));
+            writer.writeAnnotation(new DeclaredTypeName(Nonnull.class.getName()));
         }
         if (propertyGenerator.getField().getAnnotation(Nullable.class) != null) {
-            writer.writeAnnotation(new DeclaredTypeName("javax.annotation", "Nullable"));
+            writer.writeAnnotation(new DeclaredTypeName(Nullable.class.getName()));
         }
     }
 
@@ -35,14 +35,14 @@ public class NullablePlugin extends Plugin {
         if (propertyGenerator.getField().getAnnotation(Nonnull.class) != null) {
             TypeName typeName = setterParams.getArgumentTypes().get(0);
             if (typeName instanceof DeclaredTypeName) {
-                AnnotatedDeclaredTypeName annotatedDeclaredTypeName = new AnnotatedDeclaredTypeName(((DeclaredTypeName) typeName), "@javax.annotation.Nonnull");
+                AnnotatedDeclaredTypeName annotatedDeclaredTypeName = new AnnotatedDeclaredTypeName(((DeclaredTypeName) typeName), Nonnull.class);
                 setterParams.setArgumentTypes(Arrays.asList(annotatedDeclaredTypeName));
             }
         }
         if (propertyGenerator.getField().getAnnotation(Nullable.class) != null) {
             TypeName typeName = setterParams.getArgumentTypes().get(0);
             if (typeName instanceof DeclaredTypeName) {
-                AnnotatedDeclaredTypeName annotatedDeclaredTypeName = new AnnotatedDeclaredTypeName(((DeclaredTypeName) typeName), "@javax.annotation.Nullable");
+                AnnotatedDeclaredTypeName annotatedDeclaredTypeName = new AnnotatedDeclaredTypeName(((DeclaredTypeName) typeName), Nullable.class);
                 setterParams.setArgumentTypes(Arrays.asList(annotatedDeclaredTypeName));
             }
         }
