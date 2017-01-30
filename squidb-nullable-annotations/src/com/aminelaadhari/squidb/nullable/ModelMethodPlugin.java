@@ -1,8 +1,12 @@
+/*
+ * Copyright 2015, Yahoo Inc.
+ * Copyrights licensed under the Apache 2.0 License.
+ * See the accompanying LICENSE file for terms.
+ */
 package com.aminelaadhari.squidb.nullable;
 
 import com.yahoo.aptutils.model.CoreTypes;
 import com.yahoo.aptutils.model.DeclaredTypeName;
-import com.yahoo.aptutils.model.TypeName;
 import com.yahoo.aptutils.utils.AptUtils;
 import com.yahoo.aptutils.writer.JavaFileWriter;
 import com.yahoo.aptutils.writer.expressions.Expression;
@@ -32,7 +36,12 @@ import javax.lang.model.type.ErrorType;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
-
+/**
+ * A {@link Plugin} that controls copying public static methods or methods annotated with {@link ModelMethod}
+ * to the generated model. It is enabled by default but can be disabled by passing
+ * {@link PluginEnvironment#OPTIONS_DISABLE_DEFAULT_METHOD_HANDLING 'disableModelMethod'} as one of the
+ * values for the 'squidbOptions' key.
+ */
 public class ModelMethodPlugin extends Plugin {
 
     private final List<ExecutableElement> modelMethods = new ArrayList<>();
@@ -88,31 +97,28 @@ public class ModelMethodPlugin extends Plugin {
             writer.writeAnnotation(new DeclaredTypeName(Nonnull.class.getName()));
         }
 
-        List<String> argumentNames = params.getArgumentNames();
-        List<? extends TypeName> argumentTypes = params.getArgumentTypes();
-        List<TypeName> types = new ArrayList<>(argumentTypes.size());
-        for (int i = 0; i < argumentNames.size(); i++) {
-            for (VariableElement variableElement : e.getParameters()) {
-                if (argumentNames.get(i).equals(variableElement.getSimpleName().toString())) {
-                    TypeName argumentType = argumentTypes.get(i);
-                    if (argumentType instanceof DeclaredTypeName &&
-                            (variableElement.getAnnotation(Nullable.class) != null || variableElement.getAnnotation(Nonnull.class) != null)) {
-
-                        if (variableElement.getAnnotation(Nullable.class) != null) {
-                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nullable.class));
-                        }
-
-                        if (variableElement.getAnnotation(Nonnull.class) != null) {
-                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nonnull.class));
-                        }
-                    } else {
-                        types.add(argumentType);
-                    }
-                }
-            }
-
-        }
-        params.setArgumentTypes(types);
+//        List<String> argumentNames = params.getArgumentNames();
+//        List<? extends TypeName> argumentTypes = params.getArgumentTypes();
+//        List<TypeName> types = new ArrayList<>(argumentTypes.size());
+//        for (int i = 0; i < argumentNames.size(); i++) {
+//            for (VariableElement variableElement : e.getParameters()) {
+//                if (argumentNames.get(i).equals(variableElement.getSimpleName().toString())) {
+//                    TypeName argumentType = argumentTypes.get(i);
+//                    if (argumentType instanceof DeclaredTypeName) {
+//                        if (variableElement.getAnnotation(Nullable.class) != null) {
+//                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nullable.class));
+//                        }
+//
+//                        if (variableElement.getAnnotation(Nonnull.class) != null) {
+//                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nonnull.class));
+//                        }
+//                    } else {
+//                        types.add(argumentType);
+//                    }
+//                }
+//            }
+//        }
+//        params.setArgumentTypes(types);
 
         writer.beginMethodDefinition(params)
                 .writeStatement(methodCall)
