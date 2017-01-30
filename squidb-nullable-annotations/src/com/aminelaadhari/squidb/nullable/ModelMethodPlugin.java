@@ -1,12 +1,8 @@
-/*
- * Copyright 2015, Yahoo Inc.
- * Copyrights licensed under the Apache 2.0 License.
- * See the accompanying LICENSE file for terms.
- */
 package com.aminelaadhari.squidb.nullable;
 
 import com.yahoo.aptutils.model.CoreTypes;
 import com.yahoo.aptutils.model.DeclaredTypeName;
+import com.yahoo.aptutils.model.TypeName;
 import com.yahoo.aptutils.utils.AptUtils;
 import com.yahoo.aptutils.writer.JavaFileWriter;
 import com.yahoo.aptutils.writer.expressions.Expression;
@@ -24,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -88,6 +86,38 @@ public class ModelMethodPlugin extends Plugin {
             methodCall = methodCall.returnExpr();
         }
         JavadocPlugin.writeJavadocFromElement(pluginEnv, writer, e);
+        if (e.getAnnotation(Nullable.class) != null) {
+            writer.writeAnnotation(new DeclaredTypeName(Nullable.class.getName()));
+        }
+        if (e.getAnnotation(Nonnull.class) != null) {
+            writer.writeAnnotation(new DeclaredTypeName(Nonnull.class.getName()));
+        }
+
+        List<String> argumentNames = params.getArgumentNames();
+        List<? extends TypeName> argumentTypes = params.getArgumentTypes();
+        List<TypeName> types = new ArrayList<>(argumentTypes.size());
+        for (int i = 0; i < argumentNames.size(); i++) {
+            for (VariableElement variableElement : e.getParameters()) {
+                if (argumentNames.get(i).equals(variableElement.getSimpleName().toString())) {
+                    TypeName argumentType = argumentTypes.get(i);
+                    if (argumentType instanceof DeclaredTypeName) {
+
+                        if (variableElement.getAnnotation(Nullable.class) != null) {
+                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nullable.class));
+                        }
+
+                        if (variableElement.getAnnotation(Nonnull.class) != null) {
+                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nonnull.class));
+                        }
+                    } else {
+                        types.add(argumentType);
+                    }
+                }
+            }
+
+        }
+        params.setArgumentTypes(types);
+
         writer.beginMethodDefinition(params)
                 .writeStatement(methodCall)
                 .finishMethodDefinition();
