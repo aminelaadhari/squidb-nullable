@@ -100,15 +100,10 @@ public class ModelMethodPlugin extends Plugin {
             for (VariableElement variableElement : e.getParameters()) {
                 if (argumentNames.get(i).equals(variableElement.getSimpleName().toString())) {
                     TypeName argumentType = argumentTypes.get(i);
-                    if (argumentType instanceof DeclaredTypeName) {
-
-                        if (variableElement.getAnnotation(Nullable.class) != null) {
-                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nullable.class));
-                        }
-
-                        if (variableElement.getAnnotation(Nonnull.class) != null) {
-                            types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nonnull.class));
-                        }
+                    if (variableElement.getAnnotation(Nullable.class) != null) {
+                        types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nullable.class));
+                    } else if (variableElement.getAnnotation(Nonnull.class) != null) {
+                        types.add(i, new AnnotatedDeclaredTypeName((DeclaredTypeName) argumentType, Nonnull.class));
                     } else {
                         types.add(argumentType);
                     }
