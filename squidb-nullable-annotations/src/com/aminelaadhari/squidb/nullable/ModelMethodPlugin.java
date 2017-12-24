@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Generated;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
@@ -179,5 +180,13 @@ public class ModelMethodPlugin extends Plugin {
         DeclaredTypeName typeName = (DeclaredTypeName) utils.getTypeNameFromTypeMirror(type);
 
         return typeName.equals(generatedClassName) || typeName.equals(TypeConstants.ABSTRACT_MODEL);
+    }
+
+    @Override
+    public void beforeEmitClassDeclaration(JavaFileWriter writer) throws IOException {
+        writer.writeAnnotation(new DeclaredTypeName(Generated.class.getName() + "(\n" +
+                "value = \"com.aminelaadhari.squidb.nullable.ModelMethodPlugin\",\n" +
+                "comments = \"https://github.com/aminelaadhari/squidb-nullable\"\n" +
+                ")"));
     }
 }
